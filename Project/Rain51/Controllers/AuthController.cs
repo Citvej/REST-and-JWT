@@ -23,17 +23,17 @@ namespace Rain51.Controllers
         [HttpPost("token")]
         public IActionResult Token([FromBody] TokenRequest request)
         {
-            var header = Request.Headers["Authorization"];
-            if (header.ToString().StartsWith("Basic"))
-            {
-                var credValue = header.ToString().Substring("Basic ".Length).Trim();
-                var usernameAndPassenc = Encoding.UTF8.GetString(Convert.FromBase64String(credValue)); //dobim v formatu user:pass
-                var usernameAndPass = usernameAndPassenc.Split(":");
-                if (usernameAndPass[0] == "admin" && usernameAndPass[1] == "pass")
+            //var header = Request.Headers["Authorization"];
+            //if (header.ToString().StartsWith("Basic"))
+            //{
+            //    var credValue = header.ToString().Substring("Basic ".Length).Trim();
+            //    var usernameAndPassenc = Encoding.UTF8.GetString(Convert.FromBase64String(credValue)); //dobim v formatu user:pass
+                //var usernameAndPass = usernameAndPassenc.Split(":");
+                if (request.Username == "admin" && request.Password == "pass")
                 {
 
 
-                    var claimsdata = new[] { new Claim(ClaimTypes.Name, usernameAndPass[0]), new Claim(ClaimTypes.Role, "Admin") };
+                    var claimsdata = new[] { new Claim(ClaimTypes.Name, request.Username), new Claim(ClaimTypes.Role, "Admin") };
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Key"]));
                     var signInCred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
                     var token = new JwtSecurityToken(
@@ -50,11 +50,11 @@ namespace Rain51.Controllers
 
                     return Ok(tokenString);
                 }
-                if (usernameAndPass[0] == "user" && usernameAndPass[1] == "pass")
+                if (request.Username == "user" && request.Password == "pass")
                 {
 
 
-                    var claimsdata = new[] { new Claim(ClaimTypes.Name, usernameAndPass[0]), new Claim(ClaimTypes.Role, "User") };
+                    var claimsdata = new[] { new Claim(ClaimTypes.Name, request.Username), new Claim(ClaimTypes.Role, "User") };
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Key"]));
                     var signInCred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
                     var token = new JwtSecurityToken(
@@ -69,7 +69,7 @@ namespace Rain51.Controllers
 
                     return Ok(tokenString);
                 }
-            }
+            //}
             return BadRequest("Could not verify username and password.");
             //return View();
         }
